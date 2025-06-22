@@ -14,7 +14,7 @@ export const useUserChatStore = defineStore('chat', {
     addUsers({ senderId, receiverId }) {
       this.user = senderId
       this.activeReceiver = receiverId
-      const key = [senderId, receiverId].sort().join('_')
+      const key = [senderId.uid, receiverId.id].sort().join('_')
 
       //skip this state for now 21/june
       // if (!this.messages[senderId]) this.messages[senderId] = []
@@ -26,7 +26,7 @@ export const useUserChatStore = defineStore('chat', {
     addEntierConversation(conversation) {
       console.log(conversation, 'conversation in chat store')
       if (!this.activeReceiver && !this.user) return
-      const key = [this.activeReceiver, this.user].sort().join('_')
+      const key = [this.activeReceiver.id, this.user.uid].sort().join('_')
 
       this.EntierConversation[key] = conversation
     },
@@ -34,7 +34,7 @@ export const useUserChatStore = defineStore('chat', {
     //push new added conversation to array
     pushSenderMessage(chat) {
       if (!this.activeReceiver || !this.user) return
-      const key = [this.activeReceiver, this.user].sort().join('_')
+      const key = [this.activeReceiver.id, this.user.uid].sort().join('_')
 
       if (!this.EntierConversation[key]) this.EntierConversation[key] = []
 

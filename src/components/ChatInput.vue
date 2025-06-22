@@ -38,7 +38,7 @@ import { Keyboard, SendHorizonal } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
 const selectedUser = defineProps(['user'])
 const isEnter = ref(true)
-const { user, activeReceiver ,pushSenderMessage} = useUserChatStore()
+const { user, activeReceiver, pushSenderMessage } = useUserChatStore()
 
 const chat = ref('')
 watch(chat, (value) => {
@@ -48,7 +48,7 @@ watch(chat, (value) => {
   }
   isEnter.value = true
 })
-const sortedIds = [user, activeReceiver].sort()
+const sortedIds = [user.uid, activeReceiver.id].sort()
 const conversationId = `${sortedIds[0]}_${sortedIds[1]}`
 
 const handleSubmit = async () => {
@@ -60,8 +60,8 @@ const handleSubmit = async () => {
     const snap = await getDoc(ref)
 
     const messageData = {
-      senderId: user,
-      receiverId: activeReceiver,
+      senderId: user.uid,
+      receiverId: activeReceiver.id,
       text: chatValue,
       timeStamp: new Date(),
     }
@@ -71,8 +71,6 @@ const handleSubmit = async () => {
     }
   }
 }
-
-
 
 const handleKeyDown = (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {

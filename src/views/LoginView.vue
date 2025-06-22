@@ -3,7 +3,7 @@
     <div
       id="loagin-view"
       :class="{
-        'relative before:content-[\'Redirecting\'] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:text-white before:bg-black before:flex before:items-center before:justify-center before:w-full before:h-full  before:text-3xl before:opacity-50 before:z-10': true,
+        'relative before:content-[\'Redirecting\'] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:text-white before:bg-black before:flex before:items-center before:justify-center before:w-full before:h-full  before:text-3xl before:opacity-50 before:z-10': loading,
       }"
       class="w-full flex gap-2 bg-white outline-7 outline-primary -outline-offset-8 h-10/12 rounded-2xl p-8"
     >

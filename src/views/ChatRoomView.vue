@@ -32,7 +32,7 @@ import ChatInput from '@/components/ChatInput.vue'
 import ChatMessage from '@/components/ChatMessage.vue'
 import Footer from '@/components/Footer.vue'
 import { onMounted, ref, watchEffect } from 'vue'
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
+import { collection, doc, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore'
 import { useUserChatStore } from '@/stores/chatStore'
 import { auth, db } from '@/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -51,7 +51,7 @@ onMounted(() => {
 watchEffect(() => {
   if (!store.user || !store.activeReceiver) return
 
-  const sortedIds = [store.user, store.activeReceiver].sort()
+  const sortedIds = [store.user.uid, store.activeReceiver.id].sort()
   const conversationId = `${sortedIds[0]}_${sortedIds[1]}`
   console.log(conversationId)
   //handle message update of receiver in real time
@@ -63,6 +63,17 @@ watchEffect(() => {
     snapshot.docChanges().forEach((change) => {
       if (change.type === 'added') {
         store.pushSenderMessage(change.doc.data())
+        const senderDoc = doc(db, 'users', store.activeReceiver.id)
+        const receiverDoc = doc(db, 'users', store.user.uid)
+        if (change.doc.data()) {
+          store.activeReceiver.lastMessage = change.doc.data().text
+          updateDoc(receiverDoc, {
+            lastMessage: change.doc.data().text,
+          })
+          updateDoc(senderDoc, {
+            lastMessage: change.doc.data().text,
+          })
+        }
       } else if (change.type === 'modified') {
         // Message edited
       } else if (change.type === 'removed') {

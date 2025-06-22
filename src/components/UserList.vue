@@ -2,7 +2,7 @@
   <div class="w-full py-1 px-5" v-for="user in store.userList" :key="user.id">
     <div
       :class="{ 'bg-secondary/30': selectedUserId === user.id }"
-      @click="handleStartChat(user.id)"
+      @click="handleStartChat(user)"
       class="after:border-b after:w-full after:border-black hover:bg-secondary/30 px-3 py-3 rounded-lg cursor-pointer"
     >
       <div class="flex items-start justify-between">
@@ -51,11 +51,11 @@ onMounted(() => {
   getUser()
 })
 
-const handleStartChat = (id) => {
-  if (selectedUserId.value == id) return
-  selectedUserId.value = id
-  selectUser.value = id
-  chatStore.addUsers({ senderId: auth.currentUser.uid, receiverId: id })
+const handleStartChat = (user) => {
+  if (selectedUserId.value == user.id) return
+  selectedUserId.value = user.id
+  selectUser.value = user.id
+  chatStore.addUsers({ senderId: auth.currentUser, receiverId: user })
 }
 </script>
 

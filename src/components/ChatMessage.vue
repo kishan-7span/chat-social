@@ -5,7 +5,10 @@
     </div>
     <div v-if="user && history" class="pt-16">
       <div v-for="(message, index) in history" :key="index">
-        <div v-if="message.receiverId === activeUsers.user" class="w-full p-2 flex justify-start">
+        <div
+          v-if="message.receiverId === activeUsers.user.uid"
+          class="w-full p-2 flex justify-start"
+        >
           <div class="w-fit max-w-[50%] h-auto bg-gray-300 px-3 py-2 rounded-lg">
             <p>{{ message.text }}</p>
           </div>
@@ -42,7 +45,7 @@ const activeUsers = useUserChatStore()
 const user = ref(null)
 const chatEnd = ref(null)
 const selectedUser = defineProps(['user'])
-const sortedIds = [activeUsers.user, activeUsers.activeReceiver].sort()
+const sortedIds = [activeUsers.user.uid, activeUsers.activeReceiver.id].sort()
 const conversationId = `${sortedIds[0]}_${sortedIds[1]}`
 const history = ref(null)
 onMounted(async () => {
@@ -52,7 +55,7 @@ onMounted(async () => {
   //check if it's exist or not
   if (!snap.exists()) {
     await setDoc(conversationRef, {
-      users: [activeUsers.user, activeUsers.activeReceiver],
+      users: [activeUsers.user.uid, activeUsers.activeReceiver.id],
       updatedAt: new Date(),
     })
     console.log('Conversation created successfully')
@@ -79,10 +82,6 @@ onMounted(async () => {
   activeUsers.addEntierConversation(entireConversation)
 })
 
-// watchEffect(() => {
-//   console.log(activeUsers.EntierConversation[conversationId])
-//   history.value = activeUsers.EntierConversation[conversationId]
-// })
 watch(activeUsers, () => {
   history.value = activeUsers.EntierConversation[conversationId]
 })
