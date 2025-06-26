@@ -49,6 +49,7 @@ const sortedIds = [activeUsers.user.uid, activeUsers.activeReceiver.id].sort()
 const conversationId = `${sortedIds[0]}_${sortedIds[1]}`
 const history = ref(null)
 onMounted(async () => {
+  console.log("render MESSAGE")
   const conversationRef = doc(db, 'conversation', conversationId)
   //it will get conversation document from database
   const snap = await getDoc(conversationRef)

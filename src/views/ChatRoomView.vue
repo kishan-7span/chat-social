@@ -4,17 +4,25 @@
       <div class="shrink-0">
         <Navbar />
       </div>
+      <div
+        v-if="imageChange"
+        class="absolute flex justify-center items-center bg-black/20 w-full h-full"
+      >
+        <UserModel v-model:imageChange="imageChange" />
+      </div>
       <!-- Scrollable UserList -->
       <div class="overflow-y-auto flex-1">
         <UserList v-model="selectedUser" />
       </div>
-      <div>
-        <Footer />
+      <div >
+        <Footer v-model:imageChange="imageChange" />
       </div>
     </div>
+
     <div class="w-full h-full bg-green-300">
-      <div v-if="selectedUser" class="h-full flex flex-col">
+      <div v-if="selectedUser" class="relative h-full flex flex-col">
         <ChatMessage :user="selectedUser" />
+
         <ChatInput />
       </div>
 
@@ -31,6 +39,8 @@ import UserList from '@/components/UserList.vue'
 import ChatInput from '@/components/ChatInput.vue'
 import ChatMessage from '@/components/ChatMessage.vue'
 import Footer from '@/components/Footer.vue'
+import UserModel from '@/components/UserModel.vue'
+
 import { onMounted, ref, watchEffect } from 'vue'
 import { collection, doc, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore'
 import { useUserChatStore } from '@/stores/chatStore'
@@ -40,6 +50,7 @@ import { useRouter } from 'vue-router'
 
 const store = useUserChatStore()
 const selectedUser = ref(null)
+const imageChange = ref(false)
 const router = useRouter()
 onMounted(() => {
   onAuthStateChanged(auth, (user) => {

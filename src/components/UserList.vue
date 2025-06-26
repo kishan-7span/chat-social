@@ -7,7 +7,11 @@
     >
       <div class="flex items-start justify-between">
         <div class="w-full flex items-center gap-2">
-          <img :src="Social" width="13%" class="h-10 border rounded-full object-cover" />
+          <img
+            :src="user.avatar ?? DefaultUser"
+          
+            class="size-14 border rounded-full object-cover"
+          />
           <ul>
             <li>{{ user.name }}</li>
             <li class="text-zinc-600 text-sm">{{ user.lastMessage }}</li>
@@ -21,7 +25,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import Social from '../../public/social.jpg'
+import DefaultUser from '../../public/user.jpg'
 import { collection, getDocs } from 'firebase/firestore'
 import { auth, db } from '@/firebase'
 import { useUserListStore } from '@/stores/userList'
@@ -32,6 +36,7 @@ const chatStore = useUserChatStore()
 
 const selectUser = defineModel()
 onMounted(() => {
+  console.log("render")
   const getUser = async () => {
     const response = await getDocs(collection(db, 'users'))
     const user = response.docs.map((user) => ({

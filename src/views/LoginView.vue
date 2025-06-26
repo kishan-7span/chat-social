@@ -1,9 +1,10 @@
 <template>
-  <div class=" w-full h-full overflow-hidden">
+  <div class="w-full h-full overflow-hidden">
     <div
       id="loagin-view"
       :class="{
-        'relative before:content-[\'Redirecting\'] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:text-white before:bg-black before:flex before:items-center before:justify-center before:w-full before:h-full  before:text-3xl before:opacity-50 before:z-10': loading,
+        'relative before:content-[\'Redirecting\'] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:text-white before:bg-black before:flex before:items-center before:justify-center before:w-full before:h-full  before:text-3xl before:opacity-50 before:z-10':
+          loading,
       }"
       class="w-full flex gap-2 bg-white outline-7 outline-primary -outline-offset-8 h-10/12 rounded-2xl p-8"
     >
@@ -25,7 +26,9 @@
                 :disabled="loading"
               />
             </div>
-            <p v-if="error.email" class="p-0 m-0 text-red-400">Please Enter Valid Email</p>
+            <p v-if="error.email && email !== ''" class="p-0 m-0 text-red-400">
+              Please Enter Valid Email
+            </p>
             <div class="flex items-center border border-black rounded-lg px-2">
               <Key :size="16" /><input
                 v-model="password"
@@ -75,7 +78,7 @@ import { onAuthStateChanged, signInWithEmailAndPassword, updateProfile } from 'f
 import { auth, db } from '@/firebase'
 import { computed, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Timestamp, doc, setDoc } from 'firebase/firestore'
+import { Timestamp, doc, getDoc, setDoc } from 'firebase/firestore'
 
 const router = useRouter()
 const email = ref('')
@@ -97,12 +100,15 @@ const minLengthRegex = /^.{8,10}$/
 
 watch(email, (value) => {
   const regex = /^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/
-
-  if (!regex.test(value)) {
+  console.log('called after')
+  if (!value.trim() === '') {
+    error.email = false
+    return
+  }
+  if (!regex.test(value.trim())) {
     error.email = true
     return
   }
-  console.log('valid')
   error.email = false
 })
 
@@ -129,18 +135,28 @@ const handleSubmit = async () => {
   email.value = ''
   password.value = ''
   try {
-    await signInWithEmailAndPassword(auth, emailVal, passwordVal)
-    await updateProfile(auth.currentUser, {
-      displayName: emailVal.toLowerCase().startsWith('kishan') ? 'Kishan' : 'Admin',
-    })
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        syncUserToFireBase({ user })
-      }
-    })
-    console.log('Login success')
-    router.push('/chat')
+    if (emailVal.trim() !== '' && passwordVal.trim() !== '') {
+      await signInWithEmailAndPassword(auth, emailVal, passwordVal)
+      await updateProfile(auth.currentUser, {
+        displayName: emailVal.toLowerCase().startsWith('kishan') ? 'Kishan' : 'Admin',
+      })
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          const userRef = doc(db, 'users', user.uid)
+          const snap = await getDoc(userRef)
+          if (!snap.exists()) {
+            syncUserToFireBase({ user })
+          }
+        }
+      })
+
+      console.log('Login success')
+      router.push('/chat')
+      loading.value = false
+      return
+    }
     loading.value = false
+    return alert('Please enter valid email and password')
   } catch (error) {
     console.error(error)
   }
